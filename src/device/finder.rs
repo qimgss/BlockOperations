@@ -111,14 +111,8 @@ impl BlockDeviceFinder {
                 
                 if target_path.exists() {
                     match self.resolve_symlink(&target_path) {
-                        Ok(path) => {
-                            println!("Found partition at: {:?}", target_path);
-                            return Ok(path);
-                        }
-                        Err(_) => {
-                            // Continue to other methods
-                            println!("Symlink resolution failed for: {:?}", target_path);
-                        }
+                        Ok(path) => return Ok(path),
+                        Err(_) => (), // Continue to other methods
                     }
                 }
             }
@@ -126,7 +120,6 @@ impl BlockDeviceFinder {
             // Try without suffix
             let target_path = by_name_dir.join(partition_name);
             if target_path.exists() {
-                println!("Found partition at: {:?}", target_path);
                 return self.resolve_symlink(&target_path);
             }
         }
@@ -181,7 +174,6 @@ impl BlockDeviceFinder {
                             let name_str = name.to_string_lossy();
                             for target in &target_names {
                                 if name_str == *target || name_str.contains(target) {
-                                    println!("Found partition at: {:?}", path);
                                     return self.resolve_symlink(&path)
                                         .or_else(|_| Ok(path.to_string_lossy().to_string()));
                                 }
@@ -209,7 +201,6 @@ impl BlockDeviceFinder {
                 if let Some(name) = path.file_name() {
                     let name_str = name.to_string_lossy();
                     if name_str.contains(partition_name) {
-                        println!("Found partition at: {:?}", path);
                         return Ok(path.to_string_lossy().to_string());
                     }
                 }

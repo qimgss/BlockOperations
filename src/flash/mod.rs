@@ -1,2 +1,2 @@
 pub mod writer;
-pub use writer::ImageFlasher;
+pub use writer::{ImageFlasher, ImageDumper};

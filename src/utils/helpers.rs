@@ -1,9 +1,18 @@
-// Utility functions for the extratool
+use anyhow::{Result, Context};
+use std::process::Command;
 
-pub fn get_api_level() -> anyhow::Result<i32> {
-    use std::process::Command;
-    use anyhow::Context;
+pub fn is_root() -> Result<bool> {
+    let output = Command::new("id")
+        .arg("-u")
+        .output()
+        .context("Failed to execute id command")?;
     
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let uid_str = stdout.trim();
+    Ok(uid_str == "0")
+}
+
+pub fn get_api_level() -> Result<i32> {
     let output = Command::new("getprop")
         .arg("ro.build.version.sdk")
         .output()
@@ -22,8 +31,6 @@ pub fn get_api_level() -> anyhow::Result<i32> {
 }
 
 pub fn has_ab_partitions() -> bool {
-    use std::process::Command;
-    
     let result = Command::new("getprop")
         .arg("ro.build.ab_update")
         .output();
