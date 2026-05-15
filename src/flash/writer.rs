@@ -86,9 +86,6 @@ impl ImageDumper {
             cmd.arg(format!("count={}", count_str));
         }
         
-        // Add status=progress for better user feedback
-        cmd.arg("status=progress");
-        
         // Execute the command
         let status = cmd.status()
             .context("Failed to execute dd command")?;
@@ -122,7 +119,7 @@ impl ImageDumper {
     pub fn dump_partition_simple(&self, device_path: &str, output_path: &str) -> Result<()> {
         println!("Using dd to dump partition (simple method)...");
         
-        let command = format!("dd if={} of={} bs=4M conv=fsync status=progress", device_path, output_path);
+        let command = format!("dd if={} of={} bs=4M conv=fsync", device_path, output_path);
         println!("Executing: {}", command);
         
         let status = Command::new("sh")
