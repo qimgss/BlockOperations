@@ -70,7 +70,7 @@ jobs:
         echo "Cargo config created:"
         cat .cargo/config.toml
     
-    - name: Build for Android
+    - name: Build blkops
       run: |
         # 设置环境变量
         export ANDROID_NDK_HOME="${{ env.ANDROID_NDK_HOME }}"
@@ -114,7 +114,7 @@ jobs:
           ls -la "target/${{ env.TARGET }}/release/" 2>/dev/null || echo "Directory not found"
         fi
     
-    - name: Upload Android binary
+    - name: Upload blkops binary
       if: success()
       uses: actions/upload-artifact@v4
       with:
