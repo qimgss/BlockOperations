@@ -1,7 +1,7 @@
 mod cli;
 mod flash;
 mod device;
-mod utils;
+mod progress;
 
 use anyhow::Result;
 use cli::Cli;
@@ -30,8 +30,7 @@ fn main() -> Result<()> {
     
     if let Some(args) = &cli.dump {
         if args.len() >= 2 {
-            let block_size = cli.block_size.as_deref().unwrap_or("4M");
-            handle_dump(&args[0], &args[1], block_size, cli.count.as_deref())?;
+            handle_dump(&args[0], &args[1])?;
         } else {
             println!("Error: dump command requires partition and image arguments");
         }
@@ -66,7 +65,7 @@ fn handle_flash(image_path: &str, partition_name: &str) -> Result<()> {
     Ok(())
 }
 
-fn handle_dump(partition_name: &str, output_path: &str, block_size: &str, count: Option<&str>) -> Result<()> {
+fn handle_dump(partition_name: &str, output_path: &str) -> Result<()> {
     println!("Dumping partition {} to {}", partition_name, output_path);
     let finder = BlockDeviceFinder::new();
     let slot_suffix = finder.get_slot_suffix()?;
@@ -76,7 +75,7 @@ fn handle_dump(partition_name: &str, output_path: &str, block_size: &str, count:
     println!("Source device: {}", source_device);
     
     let dumper = ImageDumper::new();
-    dumper.dump_partition(&source_device, output_path, block_size, count)?;
+    dumper.dump_partition(&source_device, output_path)?;
     println!("Successfully dumped {} to {}", partition_name, output_path);
     Ok(())
 }
