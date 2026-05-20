@@ -2,9 +2,9 @@ name: Build blkops for Android AArch64
 
 on:
   push:
-    branches: [ main,blkops ]
+    branches: [ main ]
   pull_request:
-    branches: [ main,blkops ]
+    branches: [ main ]
   workflow_dispatch:
 
 env:
@@ -21,7 +21,6 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
-        ref: ${{ github.ref == 'refs/heads/main' && 'blkops' || github.ref }}
         fetch-depth: 0
     
     - name: Install Rust toolchain
