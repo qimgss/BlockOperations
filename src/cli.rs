@@ -6,7 +6,7 @@ use clap::Parser;
     author,
     version,
     about = "Android block device operation utility",
-    long_about = "A CLI tool for finding, flashing, and dumping Android block devices using dd command"
+    long_about = "A pure Rust tool for finding, flashing, and dumping Android block devices"
 )]
 pub struct Cli {
     /// Search for a partition and show its device path
@@ -37,19 +37,14 @@ impl Cli {
 }
 
 pub fn print_help() {
-    println!("blkops - Android Block Device Utility");
+    println!("blkops - Pure Rust Android Block Device Utility");
     println!();
     println!("Usage:");
-    println!("  blkops -s <partition>              Search for a partition and show its device path");
-    println!("  blkops -f <image> <partition>      Flash image to partition (using dd)");
-    println!("  blkops -d <partition> <image>      Dump partition to image file (using dd)");
-    println!("  blkops -h, --help                  Show this help message");
-    println!();
-    println!("Examples:");
-    println!("  blkops -s boot                    Find boot partition device path");
-    println!("  blkops -f boot.img boot           Flash boot.img to boot partition");
-    println!("  blkops -d boot boot.img           Dump boot partition to boot.img");
+    println!("  blkops -s, --search <partition>             Search for a partition and show its device path");
+    println!("  blkops -f, --flash <image> <partition>      Flash image to partition (pure Rust)");
+    println!("  blkops -d, --dump <partition> <image>       Dump partition to image file (pure Rust)");
+    println!("  blkops -h, --help                           Show this help message");
     println!();
     println!("The tool automatically detects the current slot suffix (getprop ro.boot.slot_suffix)");
-    println!("All operations require root permissions and use dd command internally");
+    println!("All operations are performed using pure Rust code without external dependencies.");
 }
