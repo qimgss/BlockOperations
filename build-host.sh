@@ -1,8 +1,4 @@
-abort(){
-echo "$1"
-exit
-}
-echo "What are you going to do?"
+echo "What are you will doing?"
 echo "1.Just clean"
 echo "2.Just build"
 echo "3.Clean and build"
