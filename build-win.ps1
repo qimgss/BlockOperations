@@ -10,7 +10,7 @@ param(
 $ErrorActionPreference = "Stop"
 
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "  blkops Android build script" -ForegroundColor Cyan
+Write-Host "  blkops Android cross-compilation script" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 
 # 检查 NDK 路径
