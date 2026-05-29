@@ -4,3 +4,12 @@
 [![Rust Version](https://img.shields.io/badge/rust-1.70%2B-orange.svg)](https://www.rust-lang.org/)
 
 一个专为 Android 设备设计的 Rust CLI 工具，用于查找和刷写块设备分区。
+
+```
+  _     _ _                   
+ | |__ | | | _____  _ __  ___ 
+ | '_ \| | |/ / _ \| '_ \/ __|
+ | |_) | |   < (_) | |_) \__ \
+ |_.__/|_|_|\_\___/| .__/|___/
+                   |_|        
+```

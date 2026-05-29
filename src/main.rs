@@ -1,6 +1,7 @@
 mod cli;
 mod flash;
 mod device;
+mod blockdev;
 mod progress;
 
 use anyhow::Result;
@@ -17,14 +18,22 @@ fn main() -> Result<()> {
     }
     
     if let Some(partition_name) = &cli.search {
-        handle_search(partition_name)?;
+        handle_search(partition_name, cli.path_only)?;
     }
     
     if let Some(args) = &cli.flash {
         if args.len() >= 2 {
-            handle_flash(&args[0], &args[1])?;
+            handle_write(&args[0], &args[1])?;
         } else {
             println!("Error: flash command requires image and partition arguments");
+        }
+    }
+    
+    if let Some(args) = &cli.write {
+        if args.len() >= 2 {
+            handle_write(&args[0], &args[1])?;
+        } else {
+            println!("Error: write command requires image and partition arguments");
         }
     }
     
@@ -39,19 +48,32 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-fn handle_search(partition_name: &str) -> Result<()> {
-    println!("Searching for partition: {}", partition_name);
+fn handle_search(partition_name: &str, path_only: bool) -> Result<()> {
+    if !path_only {
+        println!("Searching for partition: {}", partition_name);
+    }
+    
     let finder = BlockDeviceFinder::new();
     let slot_suffix = finder.get_slot_suffix()?;
-    println!("Detected slot suffix: {}", if slot_suffix.is_empty() { "none" } else { &slot_suffix });
+    
+    if !path_only {
+        println!("Detected slot suffix: {}", if slot_suffix.is_empty() { "none" } else { &slot_suffix });
+    }
     
     let device_path = finder.find_partition(partition_name, &slot_suffix)?;
-    println!("Found: {}", device_path);
+    
+    if path_only {
+        // 只输出设备路径，没有其他信息
+        println!("{}", device_path);
+    } else {
+        println!("Found: {}", device_path);
+    }
+    
     Ok(())
 }
 
-fn handle_flash(image_path: &str, partition_name: &str) -> Result<()> {
-    println!("Flashing {} to partition: {}", image_path, partition_name);
+fn handle_write(image_path: &str, partition_name: &str) -> Result<()> {
+    println!("Writing {} to partition: {}", image_path, partition_name);
     let finder = BlockDeviceFinder::new();
     let slot_suffix = finder.get_slot_suffix()?;
     println!("Detected slot suffix: {}", if slot_suffix.is_empty() { "none" } else { &slot_suffix });
@@ -61,7 +83,7 @@ fn handle_flash(image_path: &str, partition_name: &str) -> Result<()> {
     
     let flasher = ImageFlasher::new();
     flasher.flash_image(image_path, &target_device)?;
-    println!("Successfully flashed {} to {}", image_path, target_device);
+    println!("Successfully wrote {} to {}", image_path, target_device);
     Ok(())
 }
 

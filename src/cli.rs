@@ -5,7 +5,7 @@ use clap::Parser;
     name = "blkops",
     author,
     version,
-    about = "Android block device operation utility",
+    about = "Pure Rust Android block device operation utility",
     long_about = "A pure Rust tool for finding, flashing, and dumping Android block devices"
 )]
 pub struct Cli {
@@ -13,9 +13,17 @@ pub struct Cli {
     #[arg(short = 's', long = "search", value_name = "PARTITION")]
     pub search: Option<String>,
     
-    /// Flash an image to a partition
-    #[arg(short = 'f', long = "flash", value_name = "IMAGE", num_args = 2, value_names = &["IMAGE", "PARTITION"])]
+    /// Only show the device path when searching (no extra info)
+    #[arg(short = 'p', long = "path", requires = "search")]
+    pub path_only: bool,
+    
+    /// Flash an image to a partition (alias for --write)
+    #[arg(short = 'f', long = "flash", value_name = "IMAGE", num_args = 2, value_names = &["IMAGE", "PARTITION"], hide = true)]
     pub flash: Option<Vec<String>>,
+    
+    /// Write an image to a partition
+    #[arg(short = 'w', long = "write", value_name = "IMAGE", num_args = 2, value_names = &["IMAGE", "PARTITION"])]
+    pub write: Option<Vec<String>>,
     
     /// Dump (extract) a partition to an image file
     #[arg(short = 'd', long = "dump", value_name = "PARTITION", num_args = 2, value_names = &["PARTITION", "IMAGE"])]
@@ -32,7 +40,7 @@ impl Cli {
     }
     
     pub fn should_show_help(&self) -> bool {
-        self.help || (self.search.is_none() && self.flash.is_none() && self.dump.is_none())
+        self.help || (self.search.is_none() && self.flash.is_none() && self.write.is_none() && self.dump.is_none())
     }
 }
 
@@ -40,10 +48,17 @@ pub fn print_help() {
     println!("blkops - Pure Rust Android Block Device Utility");
     println!();
     println!("Usage:");
-    println!("  blkops -s, --search <partition>             Search for a partition and show its device path");
-    println!("  blkops -f, --flash <image> <partition>      Flash image to partition (pure Rust)");
-    println!("  blkops -d, --dump <partition> <image>       Dump partition to image file (pure Rust)");
-    println!("  blkops -h, --help                           Show this help message");
+    println!("  blkops -s <partition>              Search for a partition and show its device path");
+    println!("  blkops -s -p <partition>           Search and show only the device path");
+    println!("  blkops -w <image> <partition>      Write image to partition (pure Rust)");
+    println!("  blkops -d <partition> <image>      Dump partition to image file (pure Rust)");
+    println!("  blkops -h, --help                  Show this help message");
+    println!();
+    println!("Examples:");
+    println!("  blkops -s boot                    Find boot partition device path");
+    println!("  blkops -s -p boot                 Show only boot partition device path");
+    println!("  blkops -w boot.img boot           Write boot.img to boot partition");
+    println!("  blkops -d boot boot.img           Dump boot partition to boot.img");
     println!();
     println!("The tool automatically detects the current slot suffix (getprop ro.boot.slot_suffix)");
     println!("All operations are performed using pure Rust code without external dependencies.");
