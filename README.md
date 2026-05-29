@@ -36,6 +36,7 @@ blkops -h, --help                          Show this help message
   - 勾选 **“使用 C++ 的桌面开发”**
   - 安装 **Windows SDK**
 - [Rust](https://www.rust-lang.org/tools/install)
+- [Android NDK](https://developer.android.google.cn/ndk/downloads?hl=zh-cn)
 
 - 你需要手动修改编译脚本的Android NDK目录，否则会编译失败
 
