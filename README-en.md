@@ -1,10 +1,11 @@
-**简体中文** | [English](Readme-en.md)
+**English** | [简体中文](README.md)
 # Block Operations
+This document is machine-translated, and if there are mistakes, you can submit them to an ISSUE or Pull Request.
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](http://www.apache.org/licenses/)
 [![Rust Version](https://img.shields.io/badge/rust-1.70%2B-orange.svg)](https://www.rust-lang.org/)
 
-一个专为 Android 设备设计的 Rust CLI 工具，用于查找和刷写块设备分区。
+A Rust CLI tool developed specifically for Android devices, used to find and flash block device partitions
 
 ```
   _     _ _                   
@@ -15,9 +16,9 @@
                    |_|        
 ```
 
-# 如何使用
+# How to use
 ``` bash
-blkops - 纯 Rust 安卓 Block Device 工具
+blkops - Pure Rust Android Block Device Tool
 
 blkops -s, --search <partition>            Search for a partition and show its device path
 blkops -s <partition> -p                   Search and show only the device path
@@ -27,35 +28,35 @@ blkops -h, --help                          Show this help message
 
 ```
 
-# 如何构建
+# How to build
 <details>
-<summary>在 Windows 上编译</summary>
+<summary>Compiling on Windows</summary>
 
-构建前，请确保已安装以下环境：
+Before compiling，Please make sure to install the following environment:
 
 - [Visual Studio 2022 Build Tools](https://visualstudio.microsoft.com/downloads/)
-  - 勾选 **“使用 C++ 的桌面开发”**
-  - 安装 **Windows SDK**
+  - Choose **“Desktop development using C++”**
+  - Install **Windows SDK**
 - [Rust](https://www.rust-lang.org/tools/install)
 - [Android NDK](https://developer.android.google.cn/ndk/downloads?hl=zh-cn)
 
-- 你需要手动修改编译脚本的Android NDK目录，否则会编译失败
+- You must manual edit Android-NDK Directory in compiling script.Otherwise, it will fail to compile
 
-然后在项目根目录执行：
+Then run it in the project's root directory：
 ``` powershell
 ./build-win.ps1
 ```
 </details>
 
 <details>
-<summary>在 Linux 上编译</summary>
+<summary>Compiling on Linux</summary>
 
-构建前，请确保已安装以下环境：
+Before compiling，Please make sure to install the following environment:
 - [Rust](https://www.rust-lang.org/tools/install)
 - [Android NDK](https://developer.android.google.cn/ndk/downloads?hl=zh-cn)
 
-然后在项目根目录执行：
+Then run it in the project's root directory：
 ``` bash
-./build-linux.sh --ndk-path /path/to/android-ndk # 手动修改为Android NDK的实际路径
+./build-linux.sh --ndk-path /path/to/android-ndk # Manually modify the actual directory of the Android NDK
 ```
 </details>
