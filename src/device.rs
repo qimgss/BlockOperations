@@ -10,7 +10,6 @@ pub enum DeviceError {
     PartitionNotFound(String),
     #[error("IO error: {0}")]
     IoError(#[from] std::io::Error),
-    // 删除未使用的变体
 }
 
 pub struct BlockDeviceFinder;

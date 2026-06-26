@@ -45,9 +45,6 @@ impl ImageFile {
         if self.size != device.get_size() {
             return Ok(false);
         }
-        
-        // 这里可以实现更复杂的校验
-        // 暂时返回true
         Ok(true)
     }
 }
