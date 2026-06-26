@@ -1,13 +1,12 @@
 mod cli;
-mod flash;
+mod writer;
 mod device;
 mod blockdev;
-mod progress;
 
 use anyhow::Result;
 use cli::Cli;
 use device::BlockDeviceFinder;
-use flash::{ImageFlasher, ImageDumper};
+use writer::{ImageFlasher, ImageDumper};
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
@@ -19,14 +18,6 @@ fn main() -> Result<()> {
     
     if let Some(partition_name) = &cli.search {
         handle_search(partition_name, cli.path_only)?;
-    }
-    
-    if let Some(args) = &cli.flash {
-        if args.len() >= 2 {
-            handle_write(&args[0], &args[1])?;
-        } else {
-            println!("Error: flash command requires image and partition arguments");
-        }
     }
     
     if let Some(args) = &cli.write {
@@ -63,7 +54,6 @@ fn handle_search(partition_name: &str, path_only: bool) -> Result<()> {
     let device_path = finder.find_partition(partition_name, &slot_suffix)?;
     
     if path_only {
-        // 只输出设备路径，没有其他信息
         println!("{}", device_path);
     } else {
         println!("Found: {}", device_path);

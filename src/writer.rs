@@ -15,8 +15,7 @@ pub enum FlashError {
     PermissionDenied,
     #[error("Flash failed: {0}")]
     FlashFailed(String),
-    #[error("Dump failed: {0}")]
-    DumpFailed(String),
+    // 删除 DumpFailed，因为现在只有一个 ImageDumper
 }
 
 pub struct ImageFlasher;
@@ -26,7 +25,6 @@ impl ImageFlasher {
         ImageFlasher
     }
     
-    /// 使用纯 Rust + 块设备接口刷写
     pub fn flash_image(&self, image_path: &str, device_path: &str) -> Result<()> {
         if !self.is_root()? {
             return Err(FlashError::PermissionDenied.into());
@@ -50,7 +48,7 @@ impl ImageFlasher {
             ).into());
         }
         
-        let buffer_size = 4 * 1024 * 1024; // 4MB
+        let buffer_size = 4 * 1024 * 1024;
         let mut buffer = vec![0u8; buffer_size];
         let mut total_written = 0u64;
         let start_time = Instant::now();
@@ -60,11 +58,9 @@ impl ImageFlasher {
         while total_written < image_size {
             let to_read = std::cmp::min(buffer_size as u64, image_size - total_written) as usize;
             
-            // 从镜像读取
             let bytes_read = image.read(&mut buffer[..to_read])?;
             if bytes_read == 0 { break; }
             
-            // 写入块设备
             let bytes_written = device.write(&buffer[..bytes_read], total_written)?;
             if bytes_written != bytes_read {
                 return Err(FlashError::FlashFailed(
@@ -74,13 +70,14 @@ impl ImageFlasher {
             
             total_written += bytes_written as u64;
             
-            // 进度显示
             if total_written % (10 * 1024 * 1024) < bytes_written as u64 {
                 let percent = (total_written as f64 / image_size as f64 * 100.0) as u8;
                 let elapsed = start_time.elapsed();
-                let speed = if elapsed.as_secs() > 0 {
+                let speed = if elapsed.as_secs() >= 1 {
                     total_written as f64 / elapsed.as_secs_f64()
-                } else { 0.0 };
+                } else {
+                    0.0
+                };
                 
                 print!("\rFlashing: {}% ({}/{}) - {:.2} MB/s", 
                        percent, ByteSize(total_written), ByteSize(image_size),
@@ -89,17 +86,19 @@ impl ImageFlasher {
             }
         }
         
-        // 刷新设备缓存
         println!("\nFlushing device cache...");
         device.flush()?;
         
-        // 系统同步
+        println!("Skipping reread partition table (not applicable for partition devices)");
+        
         let _ = Command::new("sync").status();
         
         let elapsed = start_time.elapsed();
-        let speed = if elapsed.as_secs() > 0 {
+        let speed = if elapsed.as_secs() >= 1 {
             total_written as f64 / elapsed.as_secs_f64()
-        } else { 0.0 };
+        } else {
+            0.0
+        };
         
         println!("\n✅ Flash completed: {} written in {:.2}s ({:.2} MB/s)", 
                  ByteSize(total_written), elapsed.as_secs_f32(), 
@@ -127,7 +126,6 @@ impl ImageDumper {
         ImageDumper
     }
     
-    /// 使用纯 Rust + 块设备接口提取
     pub fn dump_partition(&self, device_path: &str, output_path: &str) -> Result<()> {
         if !self.is_root()? {
             return Err(FlashError::PermissionDenied.into());
@@ -144,7 +142,7 @@ impl ImageDumper {
         let device_size = device.size();
         println!("Device size: {}", ByteSize(device_size));
         
-        let buffer_size = 4 * 1024 * 1024; // 4MB
+        let buffer_size = 4 * 1024 * 1024;
         let mut buffer = vec![0u8; buffer_size];
         let mut total_read = 0u64;
         let start_time = Instant::now();
@@ -154,21 +152,20 @@ impl ImageDumper {
         while total_read < device_size {
             let to_read = std::cmp::min(buffer_size as u64, device_size - total_read) as usize;
             
-            // 从块设备读取
             let bytes_read = device.read(&mut buffer[..to_read], total_read)?;
             if bytes_read == 0 { break; }
             
-            // 写入输出文件
             output.write_all(&buffer[..bytes_read])?;
             total_read += bytes_read as u64;
             
-            // 进度显示
             if total_read % (10 * 1024 * 1024) < bytes_read as u64 {
                 let percent = (total_read as f64 / device_size as f64 * 100.0) as u8;
                 let elapsed = start_time.elapsed();
-                let speed = if elapsed.as_secs() > 0 {
+                let speed = if elapsed.as_secs() >= 1 {
                     total_read as f64 / elapsed.as_secs_f64()
-                } else { 0.0 };
+                } else {
+                    0.0
+                };
                 
                 print!("\rDumping: {}% ({}/{}) - {:.2} MB/s", 
                        percent, ByteSize(total_read), ByteSize(device_size),
@@ -177,14 +174,15 @@ impl ImageDumper {
             }
         }
         
-        // 同步输出文件
         output.sync_all()?;
         let _ = Command::new("sync").status();
         
         let elapsed = start_time.elapsed();
-        let speed = if elapsed.as_secs() > 0 {
+        let speed = if elapsed.as_secs() >= 1 {
             total_read as f64 / elapsed.as_secs_f64()
-        } else { 0.0 };
+        } else {
+            0.0
+        };
         
         println!("\n✅ Dump completed: {} written in {:.2}s ({:.2} MB/s)", 
                  ByteSize(total_read), elapsed.as_secs_f32(), 
